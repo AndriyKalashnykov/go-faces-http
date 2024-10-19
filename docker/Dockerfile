@@ -12,6 +12,7 @@ RUN apt-get install -y build-essential cmake curl
 
 # https://packages.debian.org/source/sid/dlib
 # https://packages.debian.org/sid/liblapack3
+# http://mirrors.edge.kernel.org/ubuntu/pool/main/libj/libjpeg-turbo/
 # apt-cache search libjpeg
 # apt-cache search openblas
 RUN apt-get install -y \
