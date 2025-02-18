@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	github.com/AndriyKalashnykov/go-face v0.0.1
-	github.com/bool64/dev v0.2.38
+	github.com/bool64/dev v0.2.39
 	github.com/swaggest/jsonschema-go v0.3.73
 	github.com/swaggest/openapi-go v0.2.54
 	github.com/swaggest/rest v0.2.71
