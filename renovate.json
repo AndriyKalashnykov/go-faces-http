@@ -8,7 +8,8 @@
       "matchDatasources": ["golang-version"],
       "matchPackageNames": ["go", "golang"],
       "allowedVersions": "< 2",
-      "rangeStrategy": "bump"
+      "rangeStrategy": "bump",
+      "automerge": true
     }
   ]
 }
