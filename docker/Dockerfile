@@ -30,7 +30,7 @@ RUN apt-get install -y \
     libx11-dev libgtk-3-dev
 
 # Install Go
-RUN curl -sLO https://go.dev/dl/go1.23.2.linux-amd64.tar.gz && tar -C /usr/local -xzf go1.23.2.linux-amd64.tar.gz && rm -rf go1.23.2.linux-amd64.tar.gz
+RUN curl -sLO https://go.dev/dl/go1.24.1.linux-amd64.tar.gz && tar -C /usr/local -xzf go1.24.1.linux-amd64.tar.gz && rm -rf go1.24.1.linux-amd64.tar.gz
 
 WORKDIR /app
 ADD . .

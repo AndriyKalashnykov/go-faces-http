@@ -16,7 +16,7 @@ test: ## run tests
 
 .PHONY: build
 build: ## build golang binary
-	@go build cmd/main.go -ldflags "-X main.version=$(shell git describe --abbrev=0 --tags)" -o cmd/main
+	CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran" go build -tags static -ldflags "-X main.version=$(shell git describe --abbrev=0 --tags)" -o faces faces.go
 
 .PHONY: update
 update: ## update dependency packages to latest versions
@@ -35,4 +35,4 @@ release: ## create and push a new tag
 	@echo "Done."
 
 bdi: ## build Docker image
-	docker build -f ./docker/Dockerfile -t andriykalashnykov/go-faces-http:latest .
+	docker buildx build -f ./docker/Dockerfile -t andriykalashnykov/go-faces-http:latest .
