@@ -1,7 +1,7 @@
 [![Hits](https://hits.sh/github.com/AndriyKalashnykov/go-faces-http.svg?view=today-total&style=plastic)](https://hits.sh/github.com/AndriyKalashnykov/go-faces-http/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-CC01.0-brightgreen.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
 # go-faces-http
-
+https://creativecommons.org/publicdomain/zero/1.0/
 
 Face detection HTTP microservice based on [`dlib`](https://github.com/davisking/dlib-models).
 
