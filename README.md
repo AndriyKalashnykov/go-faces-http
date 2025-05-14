@@ -1,7 +1,7 @@
 [![Hits](https://hits.sh/github.com/AndriyKalashnykov/go-faces-http.svg?view=today-total&style=plastic)](https://hits.sh/github.com/AndriyKalashnykov/go-faces-http/)
 [![License: CC0](https://img.shields.io/badge/License-CC0-brightgreen.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
+[![Renovate enabled](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://app.renovatebot.com/dashboard#github/AndriyKalashnykov/go-faces-http)
 # go-faces-http
-https://creativecommons.org/publicdomain/zero/1.0/
 
 Face detection HTTP microservice based on [`dlib`](https://github.com/davisking/dlib-models).
 
