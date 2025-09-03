@@ -1,6 +1,6 @@
 module github.com/AndriyKalashnykov/go-faces-http
 
-go 1.25.0
+go 1.25.1
 
 require (
 	github.com/AndriyKalashnykov/go-face v0.0.1
