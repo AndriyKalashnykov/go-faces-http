@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/ubuntu/tags
-FROM ubuntu:oracular-20250619 AS builder
+FROM ubuntu:oracular-20250619@sha256:cdf755952ed117f6126ff4e65810bf93767d4c38f5c7185b50ec1f1078b464cc AS builder
 
 RUN apt-get update
 RUN apt-get install -y build-essential cmake curl
@@ -37,7 +37,7 @@ ADD . .
 RUN CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran" /usr/local/go/bin/go build -tags static -o faces faces.go
 
 # Exporting minimal docker image with pre-built binary.
-FROM alpine
+FROM alpine@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1
 WORKDIR /app
 COPY --from=builder /app/faces .
 CMD ["faces", "-listen", "0.0.0.0:80"]
