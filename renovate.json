@@ -44,11 +44,15 @@
       ],
       "matchDatasources": ["docker", "golang-version"],
       "matchPackageNames": ["go", "golang"],
-      "allowedVersions": "< 2",
-      "rangeStrategy": "bump",
       "automerge": true,
       "automergeType": "pr",
       "platformAutomerge": true
+    },
+    {
+      "description": "Enforce bump range strategy",
+      "matchDatasources": ["docker", "golang-version"],
+      "matchPackageNames": ["go", "golang"],
+      "rangeStrategy": "bump"
     },
     {
       "matchManagers": [
