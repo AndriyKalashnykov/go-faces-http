@@ -25,3 +25,4 @@ go.work
 /.vscode
 /bench-*.txt
 /bin
+faces
