@@ -5,15 +5,16 @@ import (
 	"context"
 	"embed"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"runtime/debug"
 	"time"
 
 	"github.com/AndriyKalashnykov/go-face"
-	"github.com/bool64/dev/version"
 	"github.com/swaggest/jsonschema-go"
 	"github.com/swaggest/openapi-go/openapi3"
 	"github.com/swaggest/rest/web"
@@ -23,6 +24,7 @@ import (
 
 //go:embed models
 var models embed.FS
+var version = "dev"
 
 func must[V any](v V, err error) V {
 	if err != nil {
@@ -32,9 +34,21 @@ func must[V any](v V, err error) V {
 	return v
 }
 
+func printVersion() {
+	fmt.Printf("faces-http version: %s", version)
+
+	bi, ok := debug.ReadBuildInfo()
+	if !ok {
+		return
+	}
+
+	fmt.Printf(", Go version: %s\n", bi.GoVersion)
+}
+
 func main() {
 	listen := flag.String("listen", "localhost:8011", "listen address")
 	flag.Parse()
+	printVersion()
 
 	start := time.Now()
 
@@ -73,7 +87,7 @@ func main() {
 	// Init API documentation schema.
 	s.OpenAPISchema().SetTitle("Faces Detector")
 	s.OpenAPISchema().SetDescription("REST API to detect faces in images.")
-	s.OpenAPISchema().SetVersion(version.Info().Version)
+	s.OpenAPISchema().SetVersion(version)
 
 	s.Post("/image", uploadImage(rec))
 

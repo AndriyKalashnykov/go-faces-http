@@ -16,8 +16,19 @@ test: ## run tests
 
 .PHONY: build
 build: ## build golang binary
-	CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran -lblas -llapack" go build -tags netgo,osusergo,static -ldflags "-X main.version=$(shell git describe --tags 2>/dev/null || echo 'dev') -extldflags '-static'" -o faces faces.go
-
+	VERSION=$$(git describe --tags 2>/dev/null || echo 'dev'); \
+	COMMIT=$$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown'); \
+	BUILDTIME=$$(date -u '+%Y-%m-%dT%H:%M:%SZ'); \
+	CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran -lblas -llapack" go build \
+		-tags netgo,osusergo,static \
+		-buildvcs=true \
+		-ldflags " \
+			-X 'main.version=$$VERSION' \
+			-X 'github.com/AndriyKalashnykov/go-faces-http/internal/build.Version=$$VERSION' \
+			-X 'github.com/AndriyKalashnykov/go-faces-http/internal/build.Commit=$$COMMIT' \
+			-X 'github.com/AndriyKalashnykov/go-faces-http/internal/build.BuildTime=$$BUILDTIME' \
+			-extldflags '-static'" \
+		-o faces faces.go
 .PHONY: update
 update: ## update dependency packages to latest versions
 	@go get -u ./...; go mod tidy
@@ -39,4 +50,4 @@ bdi: ## build Docker image
 
 run-bdi: ## run Docker image
 	docker run --rm -p 8011:80 andriykalashnykov/go-faces-http:latest
-#docker run --rm -p 8011:80ghcr.io/andriykalashnykov/go-faces-http:v0.0.3
+# docker run --rm -p 8011:80 ghcr.io/andriykalashnykov/go-faces-http:v0.0.4
