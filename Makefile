@@ -35,4 +35,4 @@ release: ## create and push a new tag
 	@echo "Done."
 
 bdi: ## build Docker image
-	docker buildx build -f ./docker/Dockerfile -t andriykalashnykov/go-faces-http:latest .
+	docker buildx build --load --push -f ./docker/Dockerfile -t andriykalashnykov/go-faces-http:latest .
