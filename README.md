@@ -18,7 +18,7 @@ wget https://github.com/AndriyKalashnykov/go-faces-http/releases/download/latest
 It is also available as a docker image.
 
 ```
-docker run --rm -p 8011:80 andriykalashnykov/go-faces-http
+docker run --rm -p 8011:80 ghcr.io/andriykalashnykov/go-faces-http:v0.0.5
 ```
 
 If you want to build the app from source, please follow the instructions on
