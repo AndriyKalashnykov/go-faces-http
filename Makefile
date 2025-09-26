@@ -16,7 +16,7 @@ test: ## run tests
 
 .PHONY: build
 build: ## build golang binary
-	CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran" go build -tags static -ldflags "-X main.version=$(shell git describe --abbrev=0 --tags)" -o faces faces.go
+	CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran -lblas -llapack" go build -tags netgo,osusergo,static -ldflags "-X main.version=$(shell git describe --tags 2>/dev/null || echo 'dev') -extldflags '-static'" -o faces faces.go
 
 .PHONY: update
 update: ## update dependency packages to latest versions

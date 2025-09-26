@@ -41,7 +41,8 @@ RUN set -eux; \
     tar -C /usr/local -xzf "go${GOVERSION}.linux-amd64.tar.gz"; \
     rm -f "go${GOVERSION}.linux-amd64.tar.gz"
 
-RUN CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran" /usr/local/go/bin/go build -tags static -o faces faces.go
+ENV PATH=$PATH:/usr/local/go/bin
+RUN CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran -lblas -llapack" go build -tags netgo,osusergo,static -ldflags "-extldflags '-static'" -o faces faces.go
 
 # Exporting minimal docker image with pre-built binary.
 FROM alpine@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1
