@@ -39,3 +39,4 @@ bdi: ## build Docker image
 
 run-bdi: ## run Docker image
 	docker run --rm -p 8011:80 andriykalashnykov/go-faces-http:latest
+#docker run --rm -p 8011:80ghcr.io/andriykalashnykov/go-faces-http:v0.0.3

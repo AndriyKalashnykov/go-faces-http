@@ -68,5 +68,7 @@ RUN mkdir -p /usr/local/bin && \
 EXPOSE 80
 
 # Run the app
+# The executable in ENTRYPOINT
 ENTRYPOINT ["/app/faces"]
-CMD ["/app/faces", "-listen", "0.0.0.0:80"]
+# Only the parameters in CMD
+CMD ["-listen", "0.0.0.0:80"]
