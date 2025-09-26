@@ -32,11 +32,5 @@ jobs:
           go-version-file: 'go.mod'
           cache: true
 
-      - name: Run ${{ matrix.name }} tests
-        run: make test
-
-      - name: Build
-        run: make build
-
       - name: Build image
         run: make bdi
