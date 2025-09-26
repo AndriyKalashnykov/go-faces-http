@@ -32,9 +32,6 @@ jobs:
           go-version-file: 'go.mod'
           cache: true
 
-      - name: Build
-        run: make build
-
       - name: Build image
         run: |
           make bdi
