@@ -82,3 +82,7 @@ curl -X 'POST' \
 
 This repo contains models, that were created by `Davis King <https://github.com/davisking/dlib-models>`__ and are
 licensed in the public domain or under CC0 1.0 Universal. See [LICENSE](./LICENSE).
+
+### References
+
+* [Building a platform-specific executable with Docker Image and uploading to GiHub releases](https://dev.to/vearutop/building-a-portable-face-recognition-application-with-go-and-dlib-12p1)
