@@ -33,5 +33,10 @@ jobs:
           cache: true
 
       - name: Run ${{ matrix.name }} tests
-        run: make bdi
+        run: make test
 
+      - name: Build
+        run: make build
+
+      - name: Build image
+        run: make bdi

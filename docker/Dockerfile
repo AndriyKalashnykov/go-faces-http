@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/ubuntu/tags
-FROM ubuntu:oracular-20250619@sha256:cdf755952ed117f6126ff4e65810bf93767d4c38f5c7185b50ec1f1078b464cc AS builder
+FROM ubuntu:24.04 AS builder
 
 RUN apt-get update
 RUN apt-get install -y build-essential cmake curl
@@ -29,11 +29,18 @@ RUN apt-get install -y \
     gfortran \
     libx11-dev libgtk-3-dev
 
-# Install Go
-RUN curl -sLO https://go.dev/dl/go1.24.1.linux-amd64.tar.gz && tar -C /usr/local -xzf go1.24.1.linux-amd64.tar.gz && rm -rf go1.24.1.linux-amd64.tar.gz
 
 WORKDIR /app
+
 ADD . .
+
+# Install Go (version from go.mod)
+RUN set -eux; \
+    GOVERSION="$(sed -n 's/^go[[:space:]]\+\([0-9][0-9.]*\)/\1/p' go.mod)"; \
+    curl -sLO "https://go.dev/dl/go${GOVERSION}.linux-amd64.tar.gz"; \
+    tar -C /usr/local -xzf "go${GOVERSION}.linux-amd64.tar.gz"; \
+    rm -f "go${GOVERSION}.linux-amd64.tar.gz"
+
 RUN CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran" /usr/local/go/bin/go build -tags static -o faces faces.go
 
 # Exporting minimal docker image with pre-built binary.
