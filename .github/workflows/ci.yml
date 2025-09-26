@@ -36,39 +36,29 @@ jobs:
         run: |
           make bdi
 
-  release:
-    needs: tests
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-        with:
-          fetch-depth: 0
-
-      - name: Install Go
-        uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6
-        with:
-          go-version-file: 'go.mod'
-          cache: true
-
-      - name: Build Docker image
-        run: make bdi
-
+      # Steps below are only executed for tag pushes
       - name: Extract binary from Docker image
+        if: startsWith(github.ref, 'refs/tags/v')
         run: |
           docker run -v $PWD:/opt/mount --rm --entrypoint cp andriykalashnykov/go-faces-http:latest /app/faces /opt/mount/faces
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          # Create both versioned and non-versioned archives
           tar zcvf ./linux_amd64.tar.gz ./faces
+          tar zcvf ./${TAG_NAME}_linux_amd64.tar.gz ./faces
 
       - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: ./linux_amd64.tar.gz
+          files: |
+            ./linux_amd64.tar.gz
+            ./${{ github.ref_name }}_linux_amd64.tar.gz
           draft: false
           prerelease: false
 
       - name: Update Latest Release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:
           files: ./linux_amd64.tar.gz

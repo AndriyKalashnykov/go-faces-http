@@ -8,10 +8,10 @@ Face detection HTTP microservice based on [`dlib`](https://github.com/davisking/
 ## Installation
 
 Portable statically-linked binary for Linux AMD64 is available
-on [releases](https://github.com/vearutop/faces/releases).
+on [releases](https://github.com/AndriyKalashnykov/go-faces-http/releases).
 
 ```
-wget https://github.com/AndriyKalashnykov/go-faces-htdtp/releases/latest/download/linux_amd64.tar.gz && tar xf linux_amd64.tar.gz && rm linux_amd64.tar.gz
+wget https://github.com/AndriyKalashnykov/go-faces-http/releases/download/latest/linux_amd64.tar.gz && tar xf linux_amd64.tar.gz && rm linux_amd64.tar.gz
 ./faces -h
 ```
 
