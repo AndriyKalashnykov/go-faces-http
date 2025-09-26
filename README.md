@@ -15,14 +15,14 @@ wget https://github.com/AndriyKalashnykov/go-faces-http/releases/download/latest
 ./faces -h
 ```
 
-It is also available as docker image.
+It is also available as a docker image.
 
 ```
-docker run --rm -p 8011:80 vearutop/faces
+docker run --rm -p 8011:80 andriykalashnykov/go-faces-http
 ```
 
 If you want to build the app from source, please follow the instructions on
-[dependencies setup](https://github.com/Kagami/go-face?tab=readme-ov-file#requirements).
+[dependency setup](https://github.com/Kagami/go-face?tab=readme-ov-file#requirements).
 
 ## Usage
 

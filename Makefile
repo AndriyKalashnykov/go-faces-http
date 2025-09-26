@@ -35,4 +35,7 @@ release: ## create and push a new tag
 	@echo "Done."
 
 bdi: ## build Docker image
-	docker build -f ./docker/Dockerfile -t andriykalashnykov/go-faces-http:latest .
+	docker build --load -f ./docker/Dockerfile -t andriykalashnykov/go-faces-http:latest .
+
+run-bdi: ## run Docker image
+	docker run --rm -p 8011:80 andriykalashnykov/go-faces-http:latest

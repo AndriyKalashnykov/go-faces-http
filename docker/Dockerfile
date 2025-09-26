@@ -1,3 +1,4 @@
+
 # https://hub.docker.com/_/ubuntu/tags
 FROM ubuntu:24.04@sha256:353675e2a41babd526e2b837d7ec780c2a05bca0164f7ea5dbbd433d21d166fc AS builder
 
@@ -46,7 +47,26 @@ RUN CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran -lblas -llapack" go build -tag
 
 # Exporting minimal docker image with pre-built binary.
 FROM alpine@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1
-WORKDIR /app
-COPY --from=builder /app/faces .
-CMD ["faces", "-listen", "0.0.0.0:80"]
 
+# Install runtime dependencies for the binary
+RUN apk add --no-cache ca-certificates
+
+WORKDIR /app
+
+# Copy binary and models from builder
+COPY --from=builder /app/faces /app/faces
+COPY --from=builder /app/models /app/models/
+
+# Make the binary executable
+RUN chmod +x /app/faces
+
+# Create a symlink in a directory that's in PATH
+RUN mkdir -p /usr/local/bin && \
+    ln -s /app/faces /usr/local/bin/faces
+
+# Expose the port
+EXPOSE 80
+
+# Run the app
+ENTRYPOINT ["/app/faces"]
+CMD ["/app/faces", "-listen", "0.0.0.0:80"]
