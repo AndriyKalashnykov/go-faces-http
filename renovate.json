@@ -65,11 +65,14 @@
       ],
       "matchDatasources": [
         "docker",
-        "golang-version"
+        "golang-version",
+        "go"
       ],
       "matchPackageNames": [
         "go",
-        "golang"
+        "golang",
+        "ubuntu",
+        "alpine"
       ],
       "automerge": true,
       "automergeType": "pr",
