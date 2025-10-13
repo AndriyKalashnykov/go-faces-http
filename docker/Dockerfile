@@ -1,6 +1,6 @@
 
 # https://hub.docker.com/_/ubuntu/tags
-FROM ubuntu:24.04@sha256:59a458b76b4e8896031cd559576eac7d6cb53a69b38ba819fb26518536368d86 AS builder
+FROM ubuntu:24.04@sha256:66460d557b25769b102175144d538d88219c077c678a49af4afca6fbfc1b5252 AS builder
 
 RUN apt-get update
 RUN apt-get install -y build-essential cmake curl
