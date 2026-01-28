@@ -59,7 +59,7 @@ RUN VERSION=$(git describe --tags 2>/dev/null || echo 'dev') && \
         -o faces faces.go
 
 # Exporting minimal docker image with pre-built binary.
-FROM alpine@sha256:865b95f46d98cf867a156fe4a135ad3fe50d2056aa3f25ed31662dff6da4eb62
+FROM alpine@sha256:25109184c71bdad752c8312a8623239686a9a2071e8825f20acb8f2198c3f659
 
 # Install runtime dependencies for the binary
 RUN apk add --no-cache ca-certificates
