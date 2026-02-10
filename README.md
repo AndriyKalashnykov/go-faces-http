@@ -44,11 +44,15 @@ Start server.
 Send request.
 
 ```
+mkdir ~/projects && cd ~/projects
+git clone https://github.com/AndriyKalashnykov/go-faces-http
+cd ~/projects/go-faces-http
+
 curl -X 'POST' \
   'http://localhost:8011/image' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'image=@faces.jpg;type=image/jpeg'
+  -F 'image=@person.jpg;type=image/jpeg'
 ```
 
 ```json
