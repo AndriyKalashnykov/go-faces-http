@@ -84,7 +84,7 @@ curl -X 'POST' \
 }
 ```
 
-This repo contains models, that were created by [Davis King DLib Models](https://github.com/davisking/dlib-models) and are
+This repo contains models, that were created by [Davis King dlib-models](https://github.com/davisking/dlib-models) and are
 licensed in the public domain or under CC0 1.0 Universal. See [LICENSE](./LICENSE).
 
 ### References
