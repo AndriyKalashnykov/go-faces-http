@@ -1,22 +1,38 @@
-projectname?=go-faces-http
+projectname ?= go-faces-http
 
-CURRENTTAG:=$(shell git describe --tags --abbrev=0)
-NEWTAG ?= $(shell bash -c 'read -p "Please provide a new tag (currnet tag - ${CURRENTTAG}): " newtag; echo $$newtag')
+# Tool versions
+GOLANGCI_LINT_VERSION := v1.64.8
 
-default: help
+# Git metadata
+CURRENTTAG := $(shell git describe --tags --abbrev=0 2>/dev/null || echo "none")
+NEWTAG ?= $(shell bash -c 'read -p "Please provide a new tag (current tag - $(CURRENTTAG)): " newtag; echo $$newtag')
 
-.PHONY: help
+# Docker
+DOCKER_IMAGE := andriykalashnykov/$(projectname)
+DOCKER_TAG := latest
+
+# Semver regex for validation
+SEMVER_REGEX := ^v[0-9]+\.[0-9]+\.[0-9]+$$
+
+.DEFAULT_GOAL := help
+
+.PHONY: help deps test build update release image-build image-run clean lint run ci
+
 help: ## list makefile targets
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-10s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: test
-test: ## run tests
-	go test --cover -parallel=1 -v -coverprofile=coverage.out -v ./...
-	go tool cover -func=coverage.out | sort -rnk3
+deps: ## check required dependencies
+	@command -v go >/dev/null 2>&1 || { echo "ERROR: go is not installed"; exit 1; }
+	@command -v docker >/dev/null 2>&1 || { echo "ERROR: docker is not installed"; exit 1; }
+	@command -v git >/dev/null 2>&1 || { echo "ERROR: git is not installed"; exit 1; }
+	@echo "All dependencies are available."
 
-.PHONY: build
-build: ## build golang binary
-	VERSION=$$(git describe --tags 2>/dev/null || echo 'dev'); \
+test: deps ## run tests
+	@go test --cover -parallel=1 -v -coverprofile=coverage.out -v ./...
+	@go tool cover -func=coverage.out | sort -rnk3
+
+build: deps ## build golang binary
+	@VERSION=$$(git describe --tags 2>/dev/null || echo 'dev'); \
 	COMMIT=$$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown'); \
 	BUILDTIME=$$(date -u '+%Y-%m-%dT%H:%M:%SZ'); \
 	CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran -lblas -llapack" go build \
@@ -29,25 +45,42 @@ build: ## build golang binary
 			-X 'github.com/AndriyKalashnykov/go-faces-http/internal/build.BuildTime=$$BUILDTIME' \
 			-extldflags '-static'" \
 		-o faces faces.go
-.PHONY: update
+
+run: build ## run the application locally
+	@./faces -listen localhost:8011
+
 update: ## update dependency packages to latest versions
 	@go get -u ./...; go mod tidy
 
-.PHONY: release
+lint: deps ## run linter
+	@command -v golangci-lint >/dev/null 2>&1 || { echo "ERROR: golangci-lint is not installed ($(GOLANGCI_LINT_VERSION))"; exit 1; }
+	@golangci-lint run ./...
+
 release: ## create and push a new tag
 	$(eval NT=$(NEWTAG))
-	@echo -n "Are you sure to create and push ${NT} tag? [y/N] " && read ans && [ $${ans:-N} = y ]
-	@echo ${NT} > ./version.txt
+	@if ! echo "$(NT)" | grep -qE '$(SEMVER_REGEX)'; then \
+		echo "ERROR: tag '$(NT)' does not match semver format (vX.Y.Z)"; \
+		exit 1; \
+	fi
+	@echo -n "Are you sure to create and push $(NT) tag? [y/N] " && read ans && [ $${ans:-N} = y ]
+	@echo $(NT) > ./version.txt
 	@git add -A
-	@git commit -a -s -m "Cut ${NT} release"
-	@git tag ${NT}
-	@git push origin ${NT}
+	@git commit -a -s -m "Cut $(NT) release"
+	@git tag $(NT)
+	@git push origin $(NT)
 	@git push
 	@echo "Done."
 
-bdi: ## build Docker image
-	docker buildx build --load -f ./docker/Dockerfile -t andriykalashnykov/go-faces-http:latest .
+image-build: deps ## build Docker image
+	@docker buildx build --load -f ./docker/Dockerfile -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
-run-bdi: ## run Docker image
-	docker run --rm -p 8011:80 andriykalashnykov/go-faces-http:latest
-# docker run --rm -p 8011:80 ghcr.io/andriykalashnykov/go-faces-http:v0.0.9
+image-run: image-build ## run Docker image
+	@docker run --rm -p 8011:80 $(DOCKER_IMAGE):$(DOCKER_TAG)
+
+clean: ## remove build artifacts
+	@rm -f faces
+	@rm -f coverage.out
+	@echo "Clean complete."
+
+ci: lint test image-build ## run full CI pipeline (lint, test, image-build)
+	@echo "CI pipeline complete."
