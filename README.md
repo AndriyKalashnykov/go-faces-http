@@ -121,6 +121,7 @@ Run `make help` to see all available targets.
 |--------|-------------|
 | `make lint` | Run linters (Go + Dockerfile) |
 | `make test` | Run tests with coverage |
+| `make lint-dockerfile` | Lint Dockerfile with hadolint |
 
 ### Docker
 

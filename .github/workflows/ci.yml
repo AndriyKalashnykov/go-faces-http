@@ -31,7 +31,7 @@ jobs:
           cache: true
 
       - name: Lint Dockerfile
-        run: make deps-hadolint && hadolint docker/Dockerfile
+        run: make lint-dockerfile
 
       - name: Build image
         run: make image-build

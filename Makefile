@@ -54,9 +54,13 @@ clean:
 	@rm -f coverage.out
 	@echo "Clean complete."
 
-#lint: @ Run linters (Go + Dockerfile)
+#lint: @ Run all linters (Go + Dockerfile)
 lint: deps deps-hadolint
 	@golangci-lint run ./...
+	@hadolint docker/Dockerfile
+
+#lint-dockerfile: @ Lint the Dockerfile with hadolint
+lint-dockerfile: deps-hadolint
 	@hadolint docker/Dockerfile
 
 #test: @ Run tests with coverage
@@ -64,7 +68,7 @@ test: deps
 	@go test --cover -parallel=1 -v -coverprofile=coverage.out -v ./...
 	@go tool cover -func=coverage.out | sort -rnk3
 
-#build: @ Build Go binary
+#build: @ Build Go binary (requires CGO and dlib)
 build: deps
 	@VERSION=$$(git describe --tags 2>/dev/null || echo 'dev'); \
 	COMMIT=$$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown'); \
@@ -88,8 +92,8 @@ run: build
 update:
 	@go get -u ./...; go mod tidy
 
-#image-build: @ Build Docker image
-image-build: build
+#image-build: @ Build Docker image (self-contained, installs deps in container)
+image-build: deps
 	@docker buildx build --load -f ./docker/Dockerfile -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
 #image-run: @ Run Docker container
@@ -109,7 +113,7 @@ release:
 		git push && \
 		echo "Done."'
 
-#ci: @ Run full local CI pipeline
+#ci: @ Run full local CI pipeline (requires CGO and dlib)
 ci: deps lint test build
 	@echo "Local CI pipeline passed."
 
@@ -134,6 +138,6 @@ renovate-bootstrap:
 renovate-validate: renovate-bootstrap
 	@npx --yes renovate --platform=local
 
-.PHONY: help deps deps-hadolint deps-act clean lint test build run update \
+.PHONY: help deps deps-hadolint deps-act clean lint lint-dockerfile test build run update \
 	image-build image-run release ci ci-run \
 	renovate-bootstrap renovate-validate
