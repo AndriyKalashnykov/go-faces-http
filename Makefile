@@ -16,7 +16,7 @@ SEMVER_REGEX := ^v[0-9]+\.[0-9]+\.[0-9]+$$
 
 .DEFAULT_GOAL := help
 
-.PHONY: help deps test build update release image-build image-run clean lint run ci
+.PHONY: help deps test build update release image-build image-run clean lint run ci renovate-bootstrap renovate-validate
 
 help: ## list makefile targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -84,3 +84,18 @@ clean: ## remove build artifacts
 
 ci: lint test image-build ## run full CI pipeline (lint, test, image-build)
 	@echo "CI pipeline complete."
+
+# Renovate
+NVM_VERSION := 0.40.4
+
+renovate-bootstrap: ## install nvm and npm for Renovate
+	@command -v node >/dev/null 2>&1 || { \
+		echo "Installing nvm $(NVM_VERSION)..."; \
+		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v$(NVM_VERSION)/install.sh | bash; \
+		export NVM_DIR="$$HOME/.nvm"; \
+		[ -s "$$NVM_DIR/nvm.sh" ] && . "$$NVM_DIR/nvm.sh"; \
+		nvm install --lts; \
+	}
+
+renovate-validate: renovate-bootstrap ## validate Renovate configuration
+	@npx --yes renovate --platform=local
