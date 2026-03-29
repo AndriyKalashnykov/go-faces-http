@@ -13,17 +13,30 @@ Go-based face detection HTTP microservice using dlib. Provides a REST API to det
 ## Build & Development
 
 ```bash
-make help          # list all targets
-make build         # build Go binary
-make test          # run tests with coverage
-make lint          # run golangci-lint
-make image-build   # build Docker image
-make image-run     # build and run Docker image
-make ci            # full CI pipeline (lint, test, image-build)
-make clean         # remove build artifacts
-make run           # build and run locally on :8011
-make release       # create and push a new semver tag
+make help              # list all targets
+make deps              # check and install required dependencies
+make build             # build Go binary
+make test              # run tests with coverage
+make lint              # run linters (Go + Dockerfile)
+make image-build       # build Docker image
+make image-run         # run Docker container
+make ci                # full CI pipeline (lint, test, build)
+make ci-run            # run GitHub Actions locally via act
+make clean             # remove build artifacts
+make run               # build and run locally on :8011
+make update            # update Go dependencies
+make release           # create and push a new semver tag
+make renovate-validate # validate Renovate configuration
 ```
+
+## Key Variables
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `GOLANGCI_VERSION` | `2.1.6` | golangci-lint version |
+| `HADOLINT_VERSION` | `2.12.0` | hadolint version |
+| `ACT_VERSION` | `0.2.86` | act version for local CI |
+| `NVM_VERSION` | `0.40.4` | nvm version for Renovate validation |
 
 ## Project Structure
 
@@ -31,6 +44,7 @@ make release       # create and push a new semver tag
 - `models/` -- embedded dlib model files
 - `docker/Dockerfile` -- multi-stage Docker build
 - `.golangci.yml` -- linter configuration
+- `.hadolint.yaml` -- Dockerfile linter configuration
 - `version.txt` -- current release version
 
 ## CI/CD
@@ -39,7 +53,7 @@ make release       # create and push a new semver tag
 
 - **Triggers**: push to `main`, tag pushes (`v*`), pull requests
 - **Jobs**:
-  - `tests` -- builds Docker image via `make image-build`
+  - `ci` -- lint (`make lint`), test (`make test`), build (`make image-build`)
   - `release` (tag-gated) -- builds image, pushes to GHCR, creates GitHub release with binary
 
 ### Cleanup Workflow (`cleanup-runs.yml`)
