@@ -30,13 +30,10 @@ jobs:
           go-version-file: 'go.mod'
           cache: true
 
-      - name: Lint
-        run: make lint
+      - name: Lint Dockerfile
+        run: make deps-hadolint && hadolint docker/Dockerfile
 
-      - name: Test
-        run: make test
-
-      - name: Build
+      - name: Build image
         run: make image-build
 
   release:

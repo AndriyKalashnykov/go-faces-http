@@ -33,7 +33,7 @@ make renovate-validate # validate Renovate configuration
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `GOLANGCI_VERSION` | `2.1.6` | golangci-lint version |
+| `GOLANGCI_VERSION` | `1.64.8` | golangci-lint version |
 | `HADOLINT_VERSION` | `2.12.0` | hadolint version |
 | `ACT_VERSION` | `0.2.86` | act version for local CI |
 | `NVM_VERSION` | `0.40.4` | nvm version for Renovate validation |
@@ -53,7 +53,7 @@ make renovate-validate # validate Renovate configuration
 
 - **Triggers**: push to `main`, tag pushes (`v*`), pull requests
 - **Jobs**:
-  - `ci` -- lint (`make lint`), test (`make test`), build (`make image-build`)
+  - `ci` -- Dockerfile lint, Docker image build (Go lint/test require native dlib libs, run inside Docker)
   - `release` (tag-gated) -- builds image, pushes to GHCR, creates GitHub release with binary
 
 ### Cleanup Workflow (`cleanup-runs.yml`)

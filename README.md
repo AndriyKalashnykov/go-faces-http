@@ -25,7 +25,7 @@ make run           # build and run locally on :8011
 | [Docker](https://www.docker.com/) | latest | Container image builds |
 | [Git](https://git-scm.com/) | latest | Version control |
 | [GNU Make](https://www.gnu.org/software/make/) | 3.81+ | Build orchestration |
-| [golangci-lint](https://golangci-lint.run/) | 2.1.6 | Go linter (auto-installed by `make deps`) |
+| [golangci-lint](https://golangci-lint.run/) | 1.64.8 | Go linter (auto-installed by `make deps`) |
 | [hadolint](https://github.com/hadolint/hadolint) | 2.12.0 | Dockerfile linter (auto-installed by `make lint`) |
 | [act](https://github.com/nektos/act) | 0.2.86 | Run GitHub Actions locally (optional, auto-installed by `make ci-run`) |
 
@@ -150,7 +150,7 @@ GitHub Actions runs on every push to `main`, tags `v*`, and pull requests.
 
 | Job | Triggers | Steps |
 |-----|----------|-------|
-| **ci** | push, PR, tags | Lint, Test, Build |
+| **ci** | push, PR, tags | Dockerfile lint, Docker image build |
 | **release** | tag push (`v*`) | Build image, push to GHCR, create GitHub release with binary |
 
 [Renovate](https://docs.renovatebot.com/) keeps dependencies up to date with platform automerge enabled.

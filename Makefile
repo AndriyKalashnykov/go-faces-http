@@ -4,7 +4,7 @@ APP_NAME       := go-faces-http
 CURRENTTAG     := $(shell git describe --tags --abbrev=0 2>/dev/null || echo "dev")
 
 # === Tool Versions (pinned) ===
-GOLANGCI_VERSION := 2.1.6
+GOLANGCI_VERSION := 1.64.8
 HADOLINT_VERSION := 2.12.0
 ACT_VERSION      := 0.2.86
 NVM_VERSION      := 0.40.4
@@ -31,7 +31,7 @@ deps:
 	@command -v docker >/dev/null 2>&1 || { echo "ERROR: docker is not installed"; exit 1; }
 	@command -v git >/dev/null 2>&1 || { echo "ERROR: git is not installed"; exit 1; }
 	@command -v golangci-lint >/dev/null 2>&1 || { echo "Installing golangci-lint v$(GOLANGCI_VERSION)..."; \
-		go install github.com/golangci/golangci-lint/cmd/golangci-lint@v$(GOLANGCI_VERSION); \
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $$(go env GOPATH)/bin v$(GOLANGCI_VERSION); \
 	}
 
 #deps-hadolint: @ Install hadolint for Dockerfile linting
