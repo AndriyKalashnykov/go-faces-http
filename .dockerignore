@@ -1,0 +1,25 @@
+# Version control
+.git
+.gitignore
+
+# Build artifacts
+coverage.out
+faces
+*.tar.gz
+
+# CI/CD and config
+.github
+.golangci.yml
+.hadolint.yaml
+CLAUDE.md
+README.md
+renovate.json
+Makefile
+LICENSE
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~

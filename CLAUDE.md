@@ -40,7 +40,7 @@ make renovate-validate # validate Renovate configuration
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `GOLANGCI_VERSION` | `2.11.4` | golangci-lint version |
-| `HADOLINT_VERSION` | `2.12.0` | hadolint version |
+| `HADOLINT_VERSION` | `2.14.0` | hadolint version |
 | `ACT_VERSION` | `0.2.87` | act version for local CI |
 | `NVM_VERSION` | `0.40.4` | nvm version for Renovate validation |
 | `GVM_SHA` | `dd6525...` | gvm commit SHA for reproducible installs |

@@ -27,7 +27,7 @@ make run           # build and run locally on :8011
 | [GNU Make](https://www.gnu.org/software/make/) | 3.81+ | Build orchestration |
 | [gvm](https://github.com/moovweb/gvm) | latest | Go version management (auto-installed by `make deps`) |
 | [golangci-lint](https://golangci-lint.run/) | 2.11.4 | Go linter (auto-installed by `make deps`) |
-| [hadolint](https://github.com/hadolint/hadolint) | 2.12.0 | Dockerfile linter (auto-installed by `make lint-dockerfile`) |
+| [hadolint](https://github.com/hadolint/hadolint) | 2.14.0 | Dockerfile linter (auto-installed by `make lint-dockerfile`) |
 | [act](https://github.com/nektos/act) | 0.2.87 | Run GitHub Actions locally (optional, auto-installed by `make ci-run`) |
 
 Install all required dependencies:
