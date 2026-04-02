@@ -15,17 +15,23 @@ Go-based face detection HTTP microservice using dlib. Provides a REST API to det
 ```bash
 make help              # list all targets
 make deps              # check and install required dependencies
-make build             # build Go binary
-make test              # run tests with coverage
-make lint              # run linters (Go + Dockerfile)
+make deps-check        # show required tool versions and installation status
+make build             # build Go binary (requires CGO and dlib)
+make test              # run tests with coverage and race detection
+make format            # auto-format Go source files and tidy modules
+make lint              # run golangci-lint (includes gocritic via .golangci.yml)
+make lint-dockerfile   # lint the Dockerfile with hadolint
 make image-build       # build Docker image
 make image-run         # run Docker container
-make ci                # full CI pipeline (lint, test, build)
+make image-stop        # stop Docker container
+make image-push        # push Docker image to registry
+make ci                # full CI pipeline (format, lint, test, build)
 make ci-run            # run GitHub Actions locally via act
 make clean             # remove build artifacts
 make run               # build and run locally on :8011
 make update            # update Go dependencies
-make release           # create and push a new semver tag
+make release           # create and push a new tag
+make renovate-bootstrap # install nvm and npm for Renovate
 make renovate-validate # validate Renovate configuration
 ```
 
@@ -33,17 +39,18 @@ make renovate-validate # validate Renovate configuration
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `GOLANGCI_VERSION` | `1.64.8` | golangci-lint version |
+| `GOLANGCI_VERSION` | `2.11.4` | golangci-lint version |
 | `HADOLINT_VERSION` | `2.12.0` | hadolint version |
-| `ACT_VERSION` | `0.2.86` | act version for local CI |
+| `ACT_VERSION` | `0.2.87` | act version for local CI |
 | `NVM_VERSION` | `0.40.4` | nvm version for Renovate validation |
+| `GVM_SHA` | `dd6525...` | gvm commit SHA for reproducible installs |
 
 ## Project Structure
 
 - `faces.go` -- main application (HTTP server, face detection endpoint)
 - `models/` -- embedded dlib model files
 - `docker/Dockerfile` -- multi-stage Docker build
-- `.golangci.yml` -- linter configuration
+- `.golangci.yml` -- linter configuration (golangci-lint v2 with gocritic)
 - `.hadolint.yaml` -- Dockerfile linter configuration
 - `version.txt` -- current release version
 
@@ -51,10 +58,11 @@ make renovate-validate # validate Renovate configuration
 
 ### CI Workflow (`ci.yml`)
 
-- **Triggers**: push to `main`, tag pushes (`v*`), pull requests
+- **Triggers**: push to `main`, tag pushes (`v*`), pull requests, workflow_call
 - **Jobs**:
-  - `ci` -- Dockerfile lint, Docker image build (Go lint/test require native dlib libs, run inside Docker)
-  - `release` (tag-gated) -- builds image, pushes to GHCR, creates GitHub release with binary
+  - `static-check` -- Dockerfile lint (fast, no native deps needed)
+  - `build` (needs: static-check) -- Docker image build (Go compilation runs inside Docker, requires dlib)
+  - `release` (tag-gated, needs: build) -- builds image, pushes to GHCR, creates GitHub release with binary
 
 ### Cleanup Workflow (`cleanup-runs.yml`)
 
@@ -68,6 +76,8 @@ make renovate-validate # validate Renovate configuration
 - Conventional commits: `feat:`, `fix:`, `chore:`, `ci:`
 - Docker image: `andriykalashnykov/go-faces-http`
 - GHCR image: `ghcr.io/<owner>/go-faces-http`
+- Go version managed via gvm locally, `actions/setup-go` in CI
+- golangci-lint v2 with gocritic enabled via `.golangci.yml`
 
 ## Skills
 
