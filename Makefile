@@ -12,7 +12,7 @@ GVM_SHA          := dd652539fa4b771840846f8319fad303c7d0a8d2 # v1.0.22
 
 # Docker
 DOCKER_IMAGE    := andriykalashnykov/$(APP_NAME)
-DOCKER_TAG      := latest
+DOCKER_TAG      ?= $(CURRENTTAG)
 
 # Go build flags
 GOFLAGS ?= -mod=mod
@@ -37,7 +37,7 @@ SEMVER_REGEX := ^v[0-9]+\.[0-9]+\.[0-9]+$$
 help:
 	@echo "Usage: make COMMAND"
 	@echo "Commands :"
-	@grep -E '[a-zA-Z\.\-]+:.*?@ .*$$' $(MAKEFILE_LIST)| tr -d '#' | awk 'BEGIN {FS = ":.*?@ "}; {printf "\033[32m%-20s\033[0m - %s\n", $$1, $$2}'
+	@grep -E '[a-zA-Z\.\-]+:.*?@ .*$$' $(MAKEFILE_LIST)| tr -d '#' | awk 'BEGIN {FS = ":.*?@ "}; {printf "\033[32m%-22s\033[0m - %s\n", $$1, $$2}'
 
 #deps: @ Check and install required dependencies
 deps:
@@ -77,7 +77,7 @@ deps-check:
 	@printf "  %-16s " "go:"; command -v go >/dev/null 2>&1 && go version || echo "NOT installed"
 	@printf "  %-16s " "docker:"; command -v docker >/dev/null 2>&1 && docker --version || echo "NOT installed"
 	@printf "  %-16s " "git:"; command -v git >/dev/null 2>&1 && git --version || echo "NOT installed"
-	@printf "  %-16s " "golangci-lint:"; command -v golangci-lint >/dev/null 2>&1 && golangci-lint version 2>&1 | head -1 || echo "NOT installed"
+	@printf "  %-16s " "golangci-lint:"; $(call go-exec,command -v golangci-lint) >/dev/null 2>&1 && $(call go-exec,golangci-lint version 2>&1 | head -1) || echo "NOT installed"
 	@printf "  %-16s " "hadolint:"; command -v hadolint >/dev/null 2>&1 && hadolint --version || echo "NOT installed"
 	@printf "  %-16s " "act:"; command -v act >/dev/null 2>&1 && act --version || echo "NOT installed"
 
@@ -92,7 +92,7 @@ deps-hadolint:
 #deps-act: @ Install act for local CI
 deps-act: deps
 	@command -v act >/dev/null 2>&1 || { echo "Installing act $(ACT_VERSION)..."; \
-		curl -sSfL https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash -s -- -b /usr/local/bin v$(ACT_VERSION); \
+		curl -sSfL https://raw.githubusercontent.com/nektos/act/v$(ACT_VERSION)/install.sh | sudo bash -s -- -b /usr/local/bin v$(ACT_VERSION); \
 	}
 
 #clean: @ Remove build artifacts
@@ -121,19 +121,16 @@ test: deps
 
 #build: @ Build Go binary (requires CGO and dlib)
 build: deps
-	@VERSION=$$(git describe --tags 2>/dev/null || echo 'dev'); \
-	COMMIT=$$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown'); \
-	BUILDTIME=$$(date -u '+%Y-%m-%dT%H:%M:%SZ'); \
+	@$(call go-exec,VERSION=$$(git describe --tags 2>/dev/null || echo 'dev') && \
+	COMMIT=$$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown') && \
+	BUILDTIME=$$(date -u '+%Y-%m-%dT%H:%M:%SZ') && \
 	CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran -lblas -llapack" go build \
 		-tags netgo,osusergo,static \
 		-buildvcs=true \
 		-ldflags " \
 			-X 'main.version=$$VERSION' \
-			-X 'github.com/AndriyKalashnykov/go-faces-http/internal/build.Version=$$VERSION' \
-			-X 'github.com/AndriyKalashnykov/go-faces-http/internal/build.Commit=$$COMMIT' \
-			-X 'github.com/AndriyKalashnykov/go-faces-http/internal/build.BuildTime=$$BUILDTIME' \
 			-extldflags '-static'" \
-		-o faces faces.go
+		-o faces faces.go)
 
 #run: @ Build and run the application locally
 run: build
@@ -144,7 +141,7 @@ update: deps
 	@$(call go-exec,export GOFLAGS=$(GOFLAGS) && go get -u ./... && go mod tidy)
 
 #image-build: @ Build Docker image (self-contained, installs deps in container)
-image-build:
+image-build: deps
 	@docker buildx build --load -f ./docker/Dockerfile -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
 #image-run: @ Run Docker container
@@ -158,6 +155,22 @@ image-stop:
 #image-push: @ Push Docker image to registry
 image-push: image-build
 	@docker push $(DOCKER_IMAGE):$(DOCKER_TAG)
+
+#image-push-ghcr: @ Tag and push Docker image to GHCR
+image-push-ghcr:
+	@REPO_OWNER=$$(echo "$(GITHUB_REPOSITORY_OWNER)" | tr '[:upper:]' '[:lower:]'); \
+	TAG_NAME="$(TAG_NAME)"; \
+	docker tag $(DOCKER_IMAGE):$(DOCKER_TAG) ghcr.io/$$REPO_OWNER/$(APP_NAME):$$TAG_NAME; \
+	docker tag $(DOCKER_IMAGE):$(DOCKER_TAG) ghcr.io/$$REPO_OWNER/$(APP_NAME):latest; \
+	docker push ghcr.io/$$REPO_OWNER/$(APP_NAME):$$TAG_NAME; \
+	docker push ghcr.io/$$REPO_OWNER/$(APP_NAME):latest
+
+#release-artifacts: @ Extract binary from Docker image and create release archives
+release-artifacts:
+	@docker run -v $$PWD:/opt/mount --rm --entrypoint cp $(DOCKER_IMAGE):$(DOCKER_TAG) /app/faces /opt/mount/faces; \
+	TAG_NAME="$(TAG_NAME)"; \
+	tar zcvf ./linux_amd64.tar.gz ./faces; \
+	tar zcvf ./$${TAG_NAME}_linux_amd64.tar.gz ./faces
 
 #release: @ Create and push a new tag
 release:
@@ -173,7 +186,7 @@ release:
 		echo "Done."'
 
 #ci: @ Run full local CI pipeline (requires CGO and dlib for test and build)
-ci: format lint lint-dockerfile test build
+ci: deps format lint lint-dockerfile test build
 	@echo "Local CI pipeline passed."
 
 #ci-run: @ Run GitHub Actions workflow locally using act
@@ -183,20 +196,23 @@ ci-run: deps-act
 
 # Renovate
 
-#renovate-bootstrap: @ Install nvm and npm for Renovate
-renovate-bootstrap:
+#deps-node: @ Install nvm and Node.js for Renovate
+deps-node:
 	@command -v node >/dev/null 2>&1 || { \
 		echo "Installing nvm $(NVM_VERSION)..."; \
 		curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v$(NVM_VERSION)/install.sh | bash; \
 		export NVM_DIR="$$HOME/.nvm"; \
 		[ -s "$$NVM_DIR/nvm.sh" ] && . "$$NVM_DIR/nvm.sh"; \
-		nvm install --lts; \
+		nvm install 22; \
 	}
 
+#renovate-bootstrap: @ Install nvm and npm for Renovate
+renovate-bootstrap: deps-node
+
 #renovate-validate: @ Validate Renovate configuration
-renovate-validate: renovate-bootstrap
+renovate-validate: deps-node
 	@npx --yes renovate --platform=local
 
-.PHONY: help deps deps-check deps-hadolint deps-act clean format lint lint-dockerfile test build run update \
-	image-build image-run image-stop image-push release ci ci-run \
+.PHONY: help deps deps-check deps-hadolint deps-act deps-node clean format lint lint-dockerfile test build run update \
+	image-build image-run image-stop image-push image-push-ghcr release-artifacts release ci ci-run \
 	renovate-bootstrap renovate-validate

@@ -25,12 +25,15 @@ make image-build       # build Docker image
 make image-run         # run Docker container
 make image-stop        # stop Docker container
 make image-push        # push Docker image to registry
+make image-push-ghcr   # tag and push Docker image to GHCR
+make release-artifacts # extract binary and create release archives
 make ci                # full CI pipeline (format, lint, test, build)
 make ci-run            # run GitHub Actions locally via act
 make clean             # remove build artifacts
 make run               # build and run locally on :8011
 make update            # update Go dependencies
 make release           # create and push a new tag
+make deps-node         # install nvm and Node.js for Renovate
 make renovate-bootstrap # install nvm and npm for Renovate
 make renovate-validate # validate Renovate configuration
 ```
@@ -50,9 +53,13 @@ make renovate-validate # validate Renovate configuration
 - `faces.go` -- main application (HTTP server, face detection endpoint)
 - `models/` -- embedded dlib model files
 - `docker/Dockerfile` -- multi-stage Docker build
+- `.dockerignore` -- Docker build exclusions
 - `.golangci.yml` -- linter configuration (golangci-lint v2 with gocritic)
 - `.hadolint.yaml` -- Dockerfile linter configuration
+- `renovate.json` -- Renovate dependency update configuration
 - `version.txt` -- current release version
+
+**Note**: No `*_test.go` files exist yet. `make test` runs but reports zero coverage. Helper targets `deps-hadolint`, `deps-act`, and `deps-node` auto-install tools on first use.
 
 ## CI/CD
 

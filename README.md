@@ -21,7 +21,7 @@ make run           # build and run locally on :8011
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| [Go](https://go.dev/dl/) | 1.26+ | Language runtime and compiler |
+| [Go](https://go.dev/dl/) | 1.26.1+ | Language runtime and compiler |
 | [Docker](https://www.docker.com/) | latest | Container image builds |
 | [Git](https://git-scm.com/) | latest | Version control |
 | [GNU Make](https://www.gnu.org/software/make/) | 3.81+ | Build orchestration |
@@ -66,6 +66,7 @@ Run `make help` to see all available targets.
 | `make image-run` | Run Docker container |
 | `make image-stop` | Stop Docker container |
 | `make image-push` | Push Docker image to registry |
+| `make image-push-ghcr` | Tag and push Docker image to GHCR |
 
 ### CI
 
@@ -83,7 +84,9 @@ Run `make help` to see all available targets.
 | `make deps-check` | Show required tool versions and installation status |
 | `make deps-hadolint` | Install hadolint for Dockerfile linting |
 | `make deps-act` | Install act for local CI |
+| `make deps-node` | Install nvm and Node.js for Renovate |
 | `make release` | Create and push a new tag |
+| `make release-artifacts` | Extract binary from Docker image and create release archives |
 | `make renovate-bootstrap` | Install nvm and npm for Renovate |
 | `make renovate-validate` | Validate Renovate configuration |
 
@@ -160,7 +163,7 @@ GitHub Actions runs on every push to `main`, tags `v*`, and pull requests.
 
 | Job | Triggers | Steps |
 |-----|----------|-------|
-| **static-check** | push, PR, tags | Dockerfile lint |
+| **static-check** | push, PR, tags, workflow_call | Dockerfile lint |
 | **build** | after static-check | Docker image build (Go compilation runs inside Docker) |
 | **release** | tag push (`v*`) | Build image, push to GHCR, create GitHub release with binary |
 | **cleanup** | weekly (Sunday) + manual | Delete workflow runs older than 7 days, keep minimum 5 |
