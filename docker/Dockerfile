@@ -34,7 +34,7 @@ RUN apt-get install -y \
 
 WORKDIR /app
 
-ADD . .
+COPY . .
 
 # Install Go (version from go.mod)
 RUN set -eux; \
@@ -46,16 +46,11 @@ RUN set -eux; \
 ENV PATH=$PATH:/usr/local/go/bin
 # Get version from Git tag or default to 'dev'
 RUN VERSION=$(git describe --tags 2>/dev/null || echo 'dev') && \
-    COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown') && \
-    BUILDTIME=$(date -u '+%Y-%m-%dT%H:%M:%SZ') && \
     CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran -lblas -llapack" go build \
         -tags netgo,osusergo,static \
         -buildvcs=true \
         -ldflags " \
             -X 'main.version=$VERSION' \
-            -X 'github.com/AndriyKalashnykov/go-faces-http/internal/build.Version=$VERSION' \
-            -X 'github.com/AndriyKalashnykov/go-faces-http/internal/build.Commit=$COMMIT' \
-            -X 'github.com/AndriyKalashnykov/go-faces-http/internal/build.BuildTime=$BUILDTIME' \
             -extldflags '-static'" \
         -o faces faces.go
 

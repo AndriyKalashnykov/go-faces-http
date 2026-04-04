@@ -122,8 +122,6 @@ test: deps
 #build: @ Build Go binary (requires CGO and dlib)
 build: deps
 	@$(call go-exec,VERSION=$$(git describe --tags 2>/dev/null || echo 'dev') && \
-	COMMIT=$$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown') && \
-	BUILDTIME=$$(date -u '+%Y-%m-%dT%H:%M:%SZ') && \
 	CGO_ENABLED=1 CGO_LDFLAGS="-static -lgfortran -lblas -llapack" go build \
 		-tags netgo,osusergo,static \
 		-buildvcs=true \

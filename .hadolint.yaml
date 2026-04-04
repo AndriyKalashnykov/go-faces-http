@@ -2,6 +2,5 @@ ignored:
   - DL3008  # Pin versions in apt-get install
   - DL3015  # Avoid additional packages by specifying --no-install-recommends
   - DL3018  # Pin versions in apk add
-  - DL3020  # Use COPY instead of ADD
   - DL3003  # Use WORKDIR to switch to a directory
   - DL3059  # Multiple consecutive RUN instructions
