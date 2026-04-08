@@ -139,7 +139,8 @@ update: deps
 	@$(call go-exec,export GOFLAGS=$(GOFLAGS) && go get -u ./... && go mod tidy)
 
 #image-build: @ Build Docker image (self-contained, installs deps in container)
-image-build: deps
+image-build:
+	@command -v docker >/dev/null 2>&1 || { echo "ERROR: docker is not installed"; exit 1; }
 	@docker buildx build --load -f ./docker/Dockerfile -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
 #image-run: @ Run Docker container

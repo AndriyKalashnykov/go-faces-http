@@ -21,7 +21,7 @@ make run           # build and run locally on :8011
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| [Go](https://go.dev/dl/) | 1.26.1+ | Language runtime and compiler |
+| [Go](https://go.dev/dl/) | 1.26.2+ | Language runtime and compiler |
 | [Docker](https://www.docker.com/) | latest | Container image builds |
 | [Git](https://git-scm.com/) | latest | Version control |
 | [GNU Make](https://www.gnu.org/software/make/) | 3.81+ | Build orchestration |
